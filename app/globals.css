@@ -24,3 +24,67 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes hero-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  25% {
+    background-position: 45% 35%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  75% {
+    background-position: 55% 70%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse-rose {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 rgba(251, 113, 133, 0),
+      0 0 20px rgba(251, 113, 133, 0.38);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 rgba(251, 113, 133, 0),
+      0 0 34px rgba(244, 114, 182, 0.62);
+  }
+}
+
+@keyframes pulse-ivory {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 rgba(255, 251, 235, 0),
+      0 0 20px rgba(254, 243, 199, 0.72);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 rgba(255, 251, 235, 0),
+      0 0 34px rgba(253, 230, 138, 0.9);
+  }
+}
+
+.animate-pulse-rose {
+  animation: pulse-rose 2.8s ease-in-out infinite;
+}
+
+.animate-pulse-ivory {
+  animation: pulse-ivory 2.8s ease-in-out infinite;
+}
+
+.animate-hero-gradient {
+  animation: hero-gradient 22s ease-in-out infinite;
+}

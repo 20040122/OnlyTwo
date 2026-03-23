@@ -30,7 +30,7 @@ export default function LoginForm() {
       </div>
 
       <Button
-        className="h-13 w-full rounded-full border border-amber-100/90 bg-amber-50 text-[15px] font-semibold text-amber-950 shadow-[0_0_0_rgba(255,251,235,0.0),0_0_24px_rgba(254,243,199,0.78)] transition-[background-color,box-shadow,transform] duration-300 animate-pulse-ivory hover:-translate-y-0.5 hover:bg-yellow-50 hover:shadow-[0_0_0_rgba(255,251,235,0.0),0_0_38px_rgba(253,230,138,0.92)]"
+        className="h-13 w-full rounded-full border border-amber-100/90 bg-amber-50 text-[15px] font-semibold text-amber-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-yellow-50 hover:shadow-md"
         type="submit"
       >
         登录

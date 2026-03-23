@@ -41,7 +41,7 @@ export default function SignupForm() {
       </div>
 
       <Button
-        className="h-13 w-full rounded-full border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-[0_0_0_rgba(251,113,133,0.0),0_0_24px_rgba(251,113,133,0.45)] transition-[background-color,box-shadow,transform] duration-300 animate-pulse-rose hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-[0_0_0_rgba(251,113,133,0.0),0_0_38px_rgba(244,114,182,0.65)]"
+        className="h-13 w-full rounded-full border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-md"
         type="submit"
       >
         注册

@@ -56,7 +56,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-4 border-t border-white/70 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
               <p>还没有账号的话，可以先创建一个。</p>
               <Link
-                className="inline-flex items-center justify-center rounded-full border border-white/80 bg-white/75 px-5 py-2.5 font-medium text-zinc-700 shadow-[0_12px_30px_rgba(255,255,255,0.3)] transition hover:-translate-y-0.5 hover:bg-white"
+                className="inline-flex items-center justify-center rounded-full border border-white/80 bg-white/75 px-5 py-2.5 font-medium text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
                 href="/signup"
               >
                 前往注册

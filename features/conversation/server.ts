@@ -116,13 +116,16 @@ export async function getConversationForCurrentUser(): Promise<Conversation | nu
     .eq("user_id", currentUser.id)
     .limit(1)
     .maybeSingle();
-  const hasMembership = !membershipError && Boolean(membership?.conversation_id);
+  const membershipConversationId = !membershipError
+    ? membership?.conversation_id ?? null
+    : null;
+  const hasMembership = Boolean(membershipConversationId);
 
   const conversationClient = serviceSupabase ?? serverSupabase;
   let conversation =
     !hasMembership
       ? null
-      : await getConversationById(membership.conversation_id, conversationClient);
+      : await getConversationById(membershipConversationId, conversationClient);
 
   const activeRelationship = await getActiveRelationship();
 

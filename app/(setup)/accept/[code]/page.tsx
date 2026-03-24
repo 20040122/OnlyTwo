@@ -17,5 +17,5 @@ export default async function AcceptInvitePage({
     redirect(`/login?next=/accept/${encodeURIComponent(code)}`);
   }
 
-  return <VerificationModule inviteCode={code} />;
+  return <VerificationModule currentUserId={currentUser.id} inviteCode={code} />;
 }

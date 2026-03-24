@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,16 +11,20 @@ import {
   type AcceptInviteActionState,
   type CreateInviteActionState,
 } from "@/features/relationship/actions";
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 type InvitePanelProps = {
+  currentUserId: string;
   currentInviteCode?: string;
   prefilledInviteCode?: string;
 };
 
 export default function InvitePanel({
+  currentUserId,
   currentInviteCode: initialInviteCode,
   prefilledInviteCode,
 }: InvitePanelProps) {
+  const router = useRouter();
   const isAcceptMode = Boolean(prefilledInviteCode);
   const acceptFormRef = useRef<HTMLFormElement>(null);
   const hasAutoSubmittedRef = useRef(false);
@@ -58,6 +63,31 @@ export default function InvitePanel({
     hasAutoSubmittedRef.current = true;
     acceptFormRef.current?.requestSubmit();
   }, [candidateCode, isAcceptMode]);
+
+  useEffect(() => {
+    const supabase = createBrowserSupabaseClient();
+    const channel = supabase
+      .channel(`profile-status:${currentUserId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          filter: `id=eq.${currentUserId}`,
+          schema: "public",
+          table: "profiles",
+        },
+        (payload) => {
+          if (payload.new.status === "inactive") {
+            router.replace("/chat");
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [currentUserId, router]);
 
   return (
     <section className="grid gap-5 lg:grid-cols-2">

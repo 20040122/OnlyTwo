@@ -2,13 +2,20 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
+import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
 import { getCurrentUser } from "@/features/auth/server";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { Relationship, RelationshipInvite } from "@/features/relationship/types";
 
 export async function getActiveRelationship(): Promise<Relationship | null> {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return null;
+  }
+
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("only-two-access-token")?.value;
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 
   if (!accessToken) {
     return null;
@@ -19,6 +26,7 @@ export async function getActiveRelationship(): Promise<Relationship | null> {
     .from("relationships")
     .select("id, user_a_id, user_b_id, status")
     .eq("status", "active")
+    .or(`user_a_id.eq.${currentUser.id},user_b_id.eq.${currentUser.id}`)
     .limit(1)
     .maybeSingle();
 
@@ -42,7 +50,7 @@ export async function getPendingInvite(): Promise<RelationshipInvite | null> {
   }
 
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("only-two-access-token")?.value;
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 
   if (!accessToken) {
     return null;

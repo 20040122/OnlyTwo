@@ -5,10 +5,25 @@ type MessageBubbleProps = {
   message: ChatMessage;
 };
 
+function formatMessageTime(createdAt: string) {
+  const date = new Date(createdAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 export default function MessageBubble({
   isOwn,
   message,
 }: MessageBubbleProps) {
+  const messageTime = formatMessageTime(message.createdAt);
+
   return (
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
       <div
@@ -19,6 +34,11 @@ export default function MessageBubble({
         }`}
       >
         <p>{message.content}</p>
+        {messageTime ? (
+          <p className={`mt-2 text-[11px] ${isOwn ? "text-rose-900/60" : "text-zinc-500"}`}>
+            {messageTime}
+          </p>
+        ) : null}
       </div>
     </div>
   );

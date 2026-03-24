@@ -1,6 +1,9 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/features/auth/server";
+import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
+import { getConversationPageData } from "@/features/conversation/queries";
 import MessageInput from "@/features/message/components/message-input";
 import MessageList from "@/features/message/components/message-list";
 import { getCurrentProfile } from "@/features/profile/server";
@@ -29,6 +32,30 @@ export default async function ChatPage() {
     redirect("/invite");
   }
 
+  const { conversation, messages } = await getConversationPageData();
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? "";
+
+  if (!conversation) {
+    return (
+      <div className="relative flex min-h-[78vh] flex-col overflow-hidden rounded-[2.2rem] border border-amber-200/80 bg-[linear-gradient(145deg,rgba(255,251,235,0.92),rgba(255,247,237,0.78))] shadow-[0_24px_70px_rgba(120,53,15,0.08)] backdrop-blur-2xl">
+        <div className="relative flex flex-1 items-center justify-center px-6 py-12">
+          <div className="max-w-md rounded-[1.8rem] border border-amber-200/80 bg-white/80 p-6 text-center shadow-[0_18px_45px_rgba(120,53,15,0.08)]">
+            <h2 className="text-lg font-semibold tracking-tight text-amber-950">
+              会话尚未就绪
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-amber-900/80">
+              当前已检测到绑定关系，但没有找到对应的唯一会话。为避免进入脏状态，聊天页面已暂停展示消息区。
+            </p>
+            <p className="mt-2 text-sm leading-6 text-amber-900/70">
+              请先检查绑定流程是否完整，或重新进入页面。
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex min-h-[78vh] flex-col overflow-hidden rounded-[2.2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.72),rgba(255,255,255,0.52))] shadow-[0_24px_70px_rgba(15,23,42,0.06)] backdrop-blur-2xl">
       <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
@@ -40,7 +67,12 @@ export default async function ChatPage() {
           对话框
         </h2>
       </div>
-      <MessageList />
+      <MessageList
+        accessToken={accessToken}
+        conversationId={conversation.id}
+        currentUserId={currentUser.id}
+        messages={messages}
+      />
       <div className="relative border-t border-white/70 p-4 sm:p-5">
         <MessageInput />
       </div>

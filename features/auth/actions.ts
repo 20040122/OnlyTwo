@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { createServerSupabaseClient, createServiceRoleSupabaseClient } from "@/lib/supabase";
-
-const ACCESS_TOKEN_COOKIE = "only-two-access-token";
-const REFRESH_TOKEN_COOKIE = "only-two-refresh-token";
-const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  getSessionCookieOptions,
+} from "@/features/auth/session";
+import {
+  createServerSupabaseClient,
+  createServiceRoleSupabaseClient,
+} from "@/lib/supabase/server";
 
 export type AuthActionState = {
   message: string;
@@ -51,29 +55,28 @@ function getBaseUrl(headerList: Headers) {
 
 async function setSessionCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();
-  const secure = process.env.NODE_ENV === "production";
+  const cookieOptions = getSessionCookieOptions();
 
   cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: ONE_WEEK_IN_SECONDS,
+    ...cookieOptions,
   });
   cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure,
-    path: "/",
-    maxAge: ONE_WEEK_IN_SECONDS,
+    ...cookieOptions,
   });
 }
 
 async function clearSessionCookies() {
   const cookieStore = await cookies();
+  const cookieOptions = getSessionCookieOptions();
 
-  cookieStore.delete(ACCESS_TOKEN_COOKIE);
-  cookieStore.delete(REFRESH_TOKEN_COOKIE);
+  cookieStore.set(ACCESS_TOKEN_COOKIE, "", {
+    ...cookieOptions,
+    maxAge: 0,
+  });
+  cookieStore.set(REFRESH_TOKEN_COOKIE, "", {
+    ...cookieOptions,
+    maxAge: 0,
+  });
 }
 
 async function getExistingUserByEmail(email: string) {

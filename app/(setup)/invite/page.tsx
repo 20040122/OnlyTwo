@@ -10,5 +10,5 @@ export default async function InvitePage() {
     redirect("/login?next=/invite");
   }
 
-  return <VerificationModule />;
+  return <VerificationModule currentUserId={currentUser.id} />;
 }

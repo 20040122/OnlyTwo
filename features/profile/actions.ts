@@ -4,9 +4,8 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
-
-const ACCESS_TOKEN_COOKIE = "only-two-access-token";
+import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type SaveProfileActionState = {
   message: string;

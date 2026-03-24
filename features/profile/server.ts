@@ -2,7 +2,8 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type Profile = {
   id: string;
@@ -13,7 +14,7 @@ export type Profile = {
 
 export async function getCurrentProfile(): Promise<Profile | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("only-two-access-token")?.value;
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 
   if (!accessToken) {
     return null;

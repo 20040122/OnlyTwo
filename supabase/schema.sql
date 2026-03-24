@@ -192,6 +192,8 @@ end $$;
 create or replace function public.update_conversation_last_message()
 returns trigger
 language plpgsql
+security definer
+set search_path = public
 as $$
 begin
   update public.conversations
@@ -319,6 +321,26 @@ create trigger update_conversation_last_message_trigger
 after insert on public.messages
 for each row
 execute function public.update_conversation_last_message();
+
+do $$
+begin
+  if exists (
+    select 1
+    from pg_publication
+    where pubname = 'supabase_realtime'
+  ) and not exists (
+    select 1
+    from pg_publication_rel pr
+    join pg_publication p on p.oid = pr.prpubid
+    join pg_class c on c.oid = pr.prrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where p.pubname = 'supabase_realtime'
+      and n.nspname = 'public'
+      and c.relname = 'messages'
+  ) then
+    alter publication supabase_realtime add table public.messages;
+  end if;
+end $$;
 
 alter table public.profiles enable row level security;
 alter table public.relationship_invites enable row level security;

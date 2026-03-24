@@ -2,15 +2,24 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import { env } from "@/lib/env";
-
 let browserClient: SupabaseClient | undefined;
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
 export function createBrowserSupabaseClient() {
+  if (!supabaseUrl) {
+    throw new Error("Missing environment variable: NEXT_PUBLIC_SUPABASE_URL");
+  }
+
+  if (!supabaseAnonKey) {
+    throw new Error("Missing environment variable: NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  }
+
   if (!browserClient) {
     browserClient = createClient(
-      env.NEXT_PUBLIC_SUPABASE_URL,
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      supabaseUrl,
+      supabaseAnonKey,
       {
         auth: {
           persistSession: true,

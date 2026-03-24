@@ -4,11 +4,10 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
 import { assertCanCreateInvite } from "@/features/relationship/guards";
 import { getActiveRelationship } from "@/features/relationship/server";
-import { createServerSupabaseClient } from "@/lib/supabase";
-
-const ACCESS_TOKEN_COOKIE = "only-two-access-token";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type CreateInviteActionState = {
   code: string;

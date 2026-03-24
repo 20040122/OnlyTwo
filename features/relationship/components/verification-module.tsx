@@ -1,28 +1,60 @@
+import { redirect } from "next/navigation";
+
+import { getCurrentProfile } from "@/features/profile/server";
 import InvitePanel from "@/features/relationship/components/invite-panel";
-import { getPendingInvite } from "@/features/relationship/server";
+import {
+  getActiveRelationship,
+  getPendingInvite,
+} from "@/features/relationship/server";
 
 type VerificationModuleProps = {
+  currentUserId: string;
   inviteCode?: string;
 };
 
 export default function VerificationModule({
+  currentUserId,
   inviteCode,
 }: VerificationModuleProps) {
   const pendingInvitePromise = getPendingInvite();
+  const profilePromise = getCurrentProfile();
+  const activeRelationshipPromise = getActiveRelationship();
 
-  return <VerificationModuleContent inviteCode={inviteCode} pendingInvitePromise={pendingInvitePromise} />;
+  return (
+    <VerificationModuleContent
+      activeRelationshipPromise={activeRelationshipPromise}
+      currentUserId={currentUserId}
+      inviteCode={inviteCode}
+      pendingInvitePromise={pendingInvitePromise}
+      profilePromise={profilePromise}
+    />
+  );
 }
 
 type VerificationModuleContentProps = {
+  activeRelationshipPromise: ReturnType<typeof getActiveRelationship>;
+  currentUserId: string;
   inviteCode?: string;
   pendingInvitePromise: ReturnType<typeof getPendingInvite>;
+  profilePromise: ReturnType<typeof getCurrentProfile>;
 };
 
 async function VerificationModuleContent({
+  activeRelationshipPromise,
+  currentUserId,
   inviteCode,
   pendingInvitePromise,
+  profilePromise,
 }: VerificationModuleContentProps) {
-  const pendingInvite = await pendingInvitePromise;
+  const [pendingInvite, profile, activeRelationship] = await Promise.all([
+    pendingInvitePromise,
+    profilePromise,
+    activeRelationshipPromise,
+  ]);
+
+  if (profile?.status === "inactive" && activeRelationship) {
+    redirect("/chat");
+  }
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-14 selection:bg-rose-200 selection:text-rose-900">
@@ -63,6 +95,7 @@ async function VerificationModuleContent({
             </div>
 
             <InvitePanel
+              currentUserId={currentUserId}
               currentInviteCode={pendingInvite?.code}
               prefilledInviteCode={inviteCode}
             />

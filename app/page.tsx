@@ -73,10 +73,18 @@ export default function Home() {
               Only Two
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold leading-[1.15] tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl">
-              一个只属于两个人的
-              <br className="hidden sm:block" />
-              <span className="bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent">
-                私密聊天空间
+              <span className="block overflow-hidden pb-1">
+                <span className="animate-text-reveal-left-to-right inline-block motion-reduce:animate-none">
+                  一个只属于两个人的
+                </span>
+              </span>
+              <span className="block overflow-hidden pb-1">
+                <span
+                  className="animate-text-reveal-left-to-right inline-block bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent motion-reduce:animate-none"
+                  style={{ animationDelay: "320ms" }}
+                >
+                  私密聊天空间
+                </span>
               </span>
             </h1>
           </div>
@@ -89,7 +97,7 @@ export default function Home() {
               注册
             </Link>
             <Link
-              className="flex h-12 w-full items-center justify-center rounded-full border border-amber-100/90 bg-amber-50 px-6 text-amber-950 shadow-[0_0_0_rgba(255,251,235,0.0),0_0_24px_rgba(254,243,199,0.78)] transition-[background-color,box-shadow,transform] duration-300 animate-pulse-ivory hover:-translate-y-0.5 hover:bg-yellow-50 hover:shadow-[0_0_0_rgba(255,251,235,0.0),0_0_38px_rgba(253,230,138,0.92)] md:w-[158px]"
+              className="flex h-12 w-full items-center justify-center rounded-full border border-sky-200/90 bg-sky-100 px-6 text-sky-950 shadow-[0_0_0_rgba(125,211,252,0.0),0_0_24px_rgba(125,211,252,0.42)] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-cyan-200 hover:shadow-[0_0_0_rgba(125,211,252,0.0),0_0_38px_rgba(34,211,238,0.55)] md:w-[158px]"
               href="/login"
             >
               登录

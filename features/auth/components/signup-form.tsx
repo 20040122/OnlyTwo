@@ -13,6 +13,7 @@ const INITIAL_STATE: AuthActionState = {
 
 export default function SignupForm() {
   const [state, formAction, pending] = useActionState(signup, INITIAL_STATE);
+  const submitLabel = pending ? "注册中..." : "注册";
 
   return (
     <form action={formAction} className="space-y-5">
@@ -70,11 +71,21 @@ export default function SignupForm() {
       ) : null}
 
       <Button
-        className="h-13 w-full rounded-full border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-md"
+        className="group h-13 w-full rounded-full border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-md"
         disabled={pending}
         type="submit"
       >
-        {pending ? "注册中..." : "注册"}
+        <span className="flex items-center justify-center">
+          {Array.from(submitLabel).map((character, index) => (
+            <span
+              className="inline-block whitespace-pre transition-[color,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:text-rose-700 motion-reduce:transform-none motion-reduce:transition-none"
+              key={`${character}-${index}`}
+              style={{ transitionDelay: `${index * 55}ms` }}
+            >
+              {character}
+            </span>
+          ))}
+        </span>
       </Button>
     </form>
   );

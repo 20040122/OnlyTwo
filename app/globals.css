@@ -47,6 +47,18 @@ body {
   }
 }
 
+@keyframes text-reveal-left-to-right {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 @keyframes pulse-rose {
   0%,
   100% {
@@ -87,4 +99,9 @@ body {
 
 .animate-hero-gradient {
   animation: hero-gradient 22s ease-in-out infinite;
+}
+
+.animate-text-reveal-left-to-right {
+  animation: text-reveal-left-to-right 1.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: clip-path, opacity;
 }

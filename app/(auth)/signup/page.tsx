@@ -12,7 +12,7 @@ export default function SignupPage() {
         <div className="absolute left-[58%] top-[18%] h-48 w-48 rounded-full bg-sky-200/30 blur-3xl sm:h-72 sm:w-72" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl rounded-[2.5rem] border border-white/65 bg-white/55 p-5 shadow-[0_32px_90px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-7">
+      <section className="relative z-10 w-full max-w-xl">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-amber-200/30 blur-3xl" />
@@ -36,16 +36,10 @@ export default function SignupPage() {
                 </span>
                 Only Two
               </Link>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-zinc-400">
-                Sign Up
-              </p>
               <div className="space-y-3">
                 <h2 className="text-3xl font-semibold tracking-tight text-zinc-950">
                   创建你的账号
                 </h2>
-                <p className="max-w-md text-sm leading-7 text-zinc-600">
-                  注册完成后会进入个人资料初始化，随后可以生成邀请码并和唯一绑定对象建立关系。
-                </p>
               </div>
             </div>
 

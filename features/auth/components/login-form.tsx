@@ -1,9 +1,26 @@
+"use client";
+
+import { useActionState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { login, type AuthActionState } from "@/features/auth/actions";
 
-export default function LoginForm() {
+const INITIAL_STATE: AuthActionState = {
+  message: "",
+  status: "idle",
+};
+
+type LoginFormProps = {
+  nextPath?: string;
+};
+
+export default function LoginForm({ nextPath }: LoginFormProps) {
+  const [state, formAction, pending] = useActionState(login, INITIAL_STATE);
+
   return (
-    <form className="space-y-5">
+    <form action={formAction} className="space-y-5">
+      <input name="next" type="hidden" value={nextPath ?? ""} />
       <div className="space-y-2.5">
         <label className="text-sm font-medium text-zinc-700/90" htmlFor="email">
           邮箱
@@ -13,6 +30,7 @@ export default function LoginForm() {
           id="email"
           name="email"
           placeholder="you@example.com"
+          required
           type="email"
         />
       </div>
@@ -25,15 +43,30 @@ export default function LoginForm() {
           id="password"
           name="password"
           placeholder="输入你的密码"
+          required
           type="password"
         />
       </div>
 
+      {state.message ? (
+        <p
+          aria-live="polite"
+          className={`rounded-2xl px-4 py-3 text-sm ${
+            state.status === "error"
+              ? "border border-rose-200 bg-rose-50 text-rose-700"
+              : "border border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {state.message}
+        </p>
+      ) : null}
+
       <Button
         className="h-13 w-full rounded-full border border-amber-100/90 bg-amber-50 text-[15px] font-semibold text-amber-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-yellow-50 hover:shadow-md"
+        disabled={pending}
         type="submit"
       >
-        登录
+        {pending ? "登录中..." : "登录"}
       </Button>
     </form>
   );

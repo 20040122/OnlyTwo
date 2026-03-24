@@ -2,7 +2,21 @@ import Link from "next/link";
 
 import LoginForm from "@/features/auth/components/login-form";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams?: Promise<{
+    next?: string;
+    verified?: string;
+  }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = searchParams ? await searchParams : undefined;
+  const isVerified = params?.verified === "1";
+  const nextPath =
+    params?.next && params.next.startsWith("/") && !params.next.startsWith("//")
+      ? params.next
+      : undefined;
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-14 selection:bg-rose-200 selection:text-rose-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,241,242,0.95)_0%,rgba(255,247,237,0.88)_22%,rgba(255,251,235,0.86)_40%,rgba(239,246,255,0.84)_58%,rgba(250,245,255,0.88)_78%,rgba(254,242,242,0.94)_100%)] bg-[length:220%_220%] animate-hero-gradient" />
@@ -12,7 +26,7 @@ export default function LoginPage() {
         <div className="absolute left-[58%] top-[18%] h-48 w-48 rounded-full bg-sky-200/30 blur-3xl sm:h-72 sm:w-72" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl rounded-[2.5rem] border border-white/65 bg-white/55 p-5 shadow-[0_32px_90px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-7">
+      <section className="relative z-10 w-full max-w-xl">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-sky-200/30 blur-3xl" />
@@ -36,21 +50,20 @@ export default function LoginPage() {
                 </span>
                 Only Two
               </Link>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-zinc-400">
-                Login
-              </p>
               <div className="space-y-3">
                 <h2 className="text-3xl font-semibold tracking-tight text-zinc-950">
                   回到你们的空间
                 </h2>
-                <p className="max-w-md text-sm leading-7 text-zinc-600">
-                  登录后会回到专属聊天入口。首期先保留邮箱登录骨架，后续接入 Supabase Auth 会话流。
-                </p>
               </div>
             </div>
 
             <div className="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(255,255,255,0.62))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_40px_rgba(15,23,42,0.05)] sm:p-6">
-              <LoginForm />
+              {isVerified ? (
+                <p className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  邮箱验证完成，现在可以登录了。
+                </p>
+              ) : null}
+              <LoginForm nextPath={nextPath} />
             </div>
 
             <div className="flex flex-col gap-4 border-t border-white/70 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">

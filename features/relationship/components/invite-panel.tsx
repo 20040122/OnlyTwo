@@ -1,19 +1,135 @@
-import { Button } from "@/components/ui/button";
+"use client";
 
-export default function InvitePanel() {
+import { useActionState, useEffect, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  acceptInvite,
+  createInvite,
+  type AcceptInviteActionState,
+  type CreateInviteActionState,
+} from "@/features/relationship/actions";
+
+type InvitePanelProps = {
+  currentInviteCode?: string;
+  prefilledInviteCode?: string;
+};
+
+export default function InvitePanel({
+  currentInviteCode: initialInviteCode,
+  prefilledInviteCode,
+}: InvitePanelProps) {
+  const isAcceptMode = Boolean(prefilledInviteCode);
+  const acceptFormRef = useRef<HTMLFormElement>(null);
+  const hasAutoSubmittedRef = useRef(false);
+  const [inviteState, createInviteAction, createInvitePending] = useActionState(
+    createInvite,
+    {
+      code: initialInviteCode ?? "",
+      message: "",
+      status: "idle",
+    } satisfies CreateInviteActionState,
+  );
+  const [acceptState, acceptInviteAction, acceptInvitePending] = useActionState(
+    acceptInvite,
+    {
+      message: "",
+      status: "idle",
+    } satisfies AcceptInviteActionState,
+  );
+  const [candidateCode, setCandidateCode] = useState(prefilledInviteCode ?? "");
+  const currentInviteCode =
+    inviteState.code || initialInviteCode || "暂未生成";
+  const acceptMessage =
+    acceptState.message === "邀请码不能为空。" ? "" : acceptState.message;
+
+  useEffect(() => {
+    if (!isAcceptMode || hasAutoSubmittedRef.current) {
+      return;
+    }
+
+    const normalizedCode = candidateCode.trim().toUpperCase();
+
+    if (!normalizedCode) {
+      return;
+    }
+
+    hasAutoSubmittedRef.current = true;
+    acceptFormRef.current?.requestSubmit();
+  }, [candidateCode, isAcceptMode]);
+
   return (
-    <section className="space-y-4">
-      <div className="rounded-2xl bg-zinc-50 p-5">
-        <p className="text-sm text-zinc-600">当前有效邀请码</p>
-        <p className="mt-2 text-2xl font-semibold tracking-[0.2em] text-zinc-950">
-          ONLYTWO
-        </p>
+    <section className="grid gap-5 lg:grid-cols-2">
+      <div className="grid h-full grid-rows-[auto_minmax(0,1fr)_auto] gap-4 rounded-[1.9rem] border border-white/75 bg-white/70 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_18px_40px_rgba(15,23,42,0.05)]">
+        <p className="text-sm font-medium text-zinc-600">我的邀请码</p>
+
+        <div className="space-y-3">
+          <p className="text-3xl font-semibold tracking-[0.24em] text-zinc-950">
+            {currentInviteCode}
+          </p>
+          <p aria-live="polite" className="min-h-6 text-sm text-zinc-500">
+            {inviteState.message}
+          </p>
+        </div>
+
+        <form action={createInviteAction}>
+          <Button
+            className="bg-rose-200 text-rose-950 hover:bg-rose-300"
+            disabled={createInvitePending}
+            type="submit"
+          >
+            {createInvitePending ? "生成中..." : "生成邀请码"}
+          </Button>
+        </form>
       </div>
-      <div className="flex gap-3">
-        <Button>生成邀请码</Button>
-        <Button className="bg-zinc-200 text-zinc-950 hover:bg-zinc-300">
-          复制链接
-        </Button>
+
+      <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] gap-4 rounded-[1.9rem] border border-white/75 bg-[linear-gradient(145deg,rgba(255,255,255,0.78),rgba(255,255,255,0.62))] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_18px_40px_rgba(15,23,42,0.05)]">
+        <p className="text-sm font-medium text-zinc-600">输入邀请码</p>
+
+        <form
+          action={acceptInviteAction}
+          className="grid h-full grid-rows-[minmax(0,1fr)_auto] gap-4"
+          ref={acceptFormRef}
+        >
+          <Input
+            className="h-13 rounded-[1.15rem] border-white/80 bg-white/72 px-4 text-[15px] text-zinc-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_14px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl placeholder:text-zinc-400 focus:border-rose-200 focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.98),0_0_0_4px_rgba(251,113,133,0.08),0_18px_40px_rgba(15,23,42,0.05)]"
+            name="code"
+            onChange={(event) => {
+              setCandidateCode(event.target.value);
+            }}
+            placeholder="输入邀请码，例如 ONLYTWO"
+            required
+            value={candidateCode}
+          />
+
+          <div className="space-y-3">
+            {isAcceptMode ? (
+              <p aria-live="polite" className="min-h-6 text-sm text-zinc-500">
+                {acceptMessage
+                  || (acceptInvitePending
+                    ? "正在校验邀请码并完成绑定..."
+                    : "已自动开始校验并绑定。")}
+              </p>
+            ) : acceptMessage ? (
+              <p aria-live="polite" className="min-h-6 text-sm text-zinc-500">
+                {acceptMessage}
+              </p>
+            ) : (
+              <div className="min-h-6" />
+            )}
+
+            {!isAcceptMode ? (
+              <Button
+                className="bg-amber-50 text-amber-950 hover:bg-yellow-50"
+                disabled={acceptInvitePending}
+                type="submit"
+              >
+                {acceptInvitePending ? "绑定中..." : "验证并绑定"}
+              </Button>
+            ) : null}
+          </div>
+        </form>
       </div>
     </section>
   );

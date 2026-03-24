@@ -1,8 +1,29 @@
-import Link from "next/link";
+import InvitePanel from "@/features/relationship/components/invite-panel";
+import { getPendingInvite } from "@/features/relationship/server";
 
-import OnboardingForm from "@/features/profile/components/onboarding-form";
+type VerificationModuleProps = {
+  inviteCode?: string;
+};
 
-export default function OnboardingPage() {
+export default function VerificationModule({
+  inviteCode,
+}: VerificationModuleProps) {
+  const pendingInvitePromise = getPendingInvite();
+
+  return <VerificationModuleContent inviteCode={inviteCode} pendingInvitePromise={pendingInvitePromise} />;
+}
+
+type VerificationModuleContentProps = {
+  inviteCode?: string;
+  pendingInvitePromise: ReturnType<typeof getPendingInvite>;
+};
+
+async function VerificationModuleContent({
+  inviteCode,
+  pendingInvitePromise,
+}: VerificationModuleContentProps) {
+  const pendingInvite = await pendingInvitePromise;
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-14 selection:bg-rose-200 selection:text-rose-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,241,242,0.95)_0%,rgba(255,247,237,0.88)_22%,rgba(255,251,235,0.86)_40%,rgba(239,246,255,0.84)_58%,rgba(250,245,255,0.88)_78%,rgba(254,242,242,0.94)_100%)] bg-[length:220%_220%] animate-hero-gradient" />
@@ -12,18 +33,15 @@ export default function OnboardingPage() {
         <div className="absolute left-[56%] top-[16%] h-52 w-52 rounded-full bg-sky-200/25 blur-3xl sm:h-80 sm:w-80" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl">
-        <div className="relative overflow-hidden rounded-[2.15rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
+      <section className="relative z-10 w-full max-w-4xl">
+        <div className="relative overflow-hidden rounded-[2.2rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.72),rgba(255,255,255,0.52))] p-7 shadow-[0_24px_70px_rgba(15,23,42,0.06)] backdrop-blur-2xl sm:p-10">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
-          <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-amber-200/28 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-28 rounded-full bg-rose-200/22 blur-3xl" />
+          <div className="pointer-events-none absolute -top-14 left-8 h-32 w-32 rounded-full bg-rose-200/25 blur-3xl" />
+          <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-28 rounded-full bg-sky-200/20 blur-3xl" />
 
           <div className="relative space-y-8">
-            <div className="space-y-3">
-              <Link
-                className="inline-flex items-center gap-3 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-zinc-700 shadow-[0_12px_30px_rgba(255,255,255,0.3)] backdrop-blur-xl transition hover:bg-white/85"
-                href="/"
-              >
+            <div className="space-y-4 text-center">
+              <div className="inline-flex items-center gap-3 rounded-full border border-white/80 bg-white/72 px-4 py-2 text-sm font-medium text-zinc-700 shadow-[0_12px_30px_rgba(255,255,255,0.3)] backdrop-blur-xl">
                 <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-400 to-orange-300 text-white shadow-lg shadow-rose-300/50">
                   <svg
                     aria-hidden="true"
@@ -35,18 +53,19 @@ export default function OnboardingPage() {
                   </svg>
                 </span>
                 Only Two
-              </Link>
+              </div>
 
               <div className="space-y-3">
-                <h2 className="text-3xl font-semibold tracking-tight text-zinc-950">
-                  完善资料
-                </h2>
+                <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
+                  配对验证
+                </h1>
               </div>
             </div>
 
-            <div className="rounded-[1.8rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(255,255,255,0.62))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_18px_40px_rgba(15,23,42,0.05)] sm:p-6">
-              <OnboardingForm />
-            </div>
+            <InvitePanel
+              currentInviteCode={pendingInvite?.code}
+              prefilledInviteCode={inviteCode}
+            />
           </div>
         </div>
       </section>

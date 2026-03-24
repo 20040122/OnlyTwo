@@ -1,9 +1,21 @@
+"use client";
+
+import { useActionState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { signup, type AuthActionState } from "@/features/auth/actions";
+
+const INITIAL_STATE: AuthActionState = {
+  message: "",
+  status: "idle",
+};
 
 export default function SignupForm() {
+  const [state, formAction, pending] = useActionState(signup, INITIAL_STATE);
+
   return (
-    <form className="space-y-5">
+    <form action={formAction} className="space-y-5">
       <div className="space-y-2.5">
         <label className="text-sm font-medium text-zinc-700/90" htmlFor="nickname">
           昵称
@@ -13,6 +25,7 @@ export default function SignupForm() {
           id="nickname"
           name="nickname"
           placeholder="Only Two"
+          required
         />
       </div>
       <div className="space-y-2.5">
@@ -24,6 +37,7 @@ export default function SignupForm() {
           id="email"
           name="email"
           placeholder="you@example.com"
+          required
           type="email"
         />
       </div>
@@ -36,15 +50,31 @@ export default function SignupForm() {
           id="password"
           name="password"
           placeholder="创建一个密码"
+          minLength={6}
+          required
           type="password"
         />
       </div>
 
+      {state.message ? (
+        <p
+          aria-live="polite"
+          className={`rounded-2xl px-4 py-3 text-sm ${
+            state.status === "error"
+              ? "border border-rose-200 bg-rose-50 text-rose-700"
+              : "border border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {state.message}
+        </p>
+      ) : null}
+
       <Button
         className="h-13 w-full rounded-full border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-md"
+        disabled={pending}
         type="submit"
       >
-        注册
+        {pending ? "注册中..." : "注册"}
       </Button>
     </form>
   );

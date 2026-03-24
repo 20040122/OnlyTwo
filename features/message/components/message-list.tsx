@@ -22,7 +22,7 @@ const seedMessages: ChatMessage[] = [
 
 export default function MessageList() {
   return (
-    <div className="flex flex-1 flex-col gap-4 overflow-y-auto bg-zinc-50 px-4 py-6">
+    <div className="flex flex-1 flex-col gap-4 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(255,248,250,0.34))] px-4 py-6 sm:px-6">
       {seedMessages.map((message) => (
         <MessageBubble
           isOwn={message.senderUserId === "u1"}

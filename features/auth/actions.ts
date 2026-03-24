@@ -53,6 +53,49 @@ function getBaseUrl(headerList: Headers) {
   return host ? `${protocol}://${host}` : "http://127.0.0.1:3000";
 }
 
+function buildSignupEmailRedirectUrl(headerList: Headers) {
+  const callbackUrl = new URL("/callback", getBaseUrl(headerList));
+  callbackUrl.searchParams.set("next", "/login?verified=1");
+
+  return callbackUrl.toString();
+}
+
+function getSignupErrorMessage(errorMessage: string) {
+  const normalizedMessage = errorMessage.toLowerCase();
+
+  if (normalizedMessage.includes("already")) {
+    return "该邮箱已注册，请直接登录。";
+  }
+
+  if (
+    (normalizedMessage.includes("redirect") && normalizedMessage.includes("allow")) ||
+    normalizedMessage.includes("invalid redirect url")
+  ) {
+    return "注册失败：Supabase Auth 的 Redirect URLs 没有包含当前域名的 /callback 地址。";
+  }
+
+  if (
+    normalizedMessage.includes("error sending confirmation email") ||
+    normalizedMessage.includes("smtp")
+  ) {
+    return "注册失败：Supabase 暂时无法发送验证邮件，请检查 Auth 邮件配置。";
+  }
+
+  if (
+    normalizedMessage.includes("email rate limit") ||
+    normalizedMessage.includes("over_email_send_rate_limit") ||
+    normalizedMessage.includes("rate limit")
+  ) {
+    return "注册失败：验证邮件发送过于频繁，请稍后再试。";
+  }
+
+  if (normalizedMessage.includes("signups not allowed")) {
+    return "注册失败：当前 Supabase 项目已关闭注册。";
+  }
+
+  return `注册失败：${errorMessage}`;
+}
+
 async function setSessionCookies(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies();
   const cookieOptions = getSessionCookieOptions();
@@ -146,7 +189,7 @@ export async function signup(
 
   const headerList = await headers();
   const supabase = createServerSupabaseClient();
-  const emailRedirectTo = `${getBaseUrl(headerList)}/callback?next=/login?verified=1`;
+  const emailRedirectTo = buildSignupEmailRedirectUrl(headerList);
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -159,11 +202,11 @@ export async function signup(
   });
 
   if (error) {
+    console.error("Supabase signup failed.", error);
+
     return {
       status: "error",
-      message: error.message.includes("already")
-        ? "该邮箱已注册，请直接登录。"
-        : "注册失败，请稍后重试。",
+      message: getSignupErrorMessage(error.message),
     };
   }
 

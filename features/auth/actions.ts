@@ -9,6 +9,7 @@ import {
   REFRESH_TOKEN_COOKIE,
   getSessionCookieOptions,
 } from "@/features/auth/session";
+import { upsertProfileForUser } from "@/features/profile/actions";
 import {
   createServerSupabaseClient,
   createServiceRoleSupabaseClient,
@@ -159,19 +160,34 @@ async function getPostLoginRedirectPath(accessToken: string) {
   return "/invite";
 }
 
+async function bootstrapProfileAfterLogin(
+  accessToken: string,
+  userId: string,
+  nickname: string,
+) {
+  const normalizedNickname = nickname.trim();
+
+  if (!normalizedNickname) {
+    return;
+  }
+
+  const result = await upsertProfileForUser(accessToken, userId, {
+    nickname: normalizedNickname,
+  });
+
+  if (!result.ok) {
+    console.error("Failed to bootstrap profile after login.", result.message);
+  }
+}
+
 export async function signup(
   prevState: AuthActionState = EMPTY_STATE,
   formData: FormData,
 ): Promise<AuthActionState> {
   void prevState;
 
-  const nickname = normalizeValue(formData.get("nickname"));
   const email = normalizeValue(formData.get("email")).toLowerCase();
   const password = normalizeValue(formData.get("password"));
-
-  if (!nickname) {
-    return { status: "error", message: "请输入昵称。" };
-  }
 
   if (!email || !isValidEmail(email)) {
     return { status: "error", message: "请输入有效邮箱。" };
@@ -195,9 +211,6 @@ export async function signup(
     password,
     options: {
       emailRedirectTo,
-      data: {
-        nickname,
-      },
     },
   });
 
@@ -254,6 +267,13 @@ export async function login(
   }
 
   await setSessionCookies(data.session.access_token, data.session.refresh_token);
+  await bootstrapProfileAfterLogin(
+    data.session.access_token,
+    data.user.id,
+    typeof data.user.user_metadata?.nickname === "string"
+      ? data.user.user_metadata.nickname
+      : "",
+  );
   revalidatePath("/", "layout");
 
   redirect(nextPath || await getPostLoginRedirectPath(data.session.access_token));

@@ -40,7 +40,7 @@ export async function listMessages(conversationId?: string): Promise<ChatMessage
     : serverSupabase;
   const { data, error } = await supabase
     .from("messages")
-    .select("id, conversation_id, sender_user_id, content, created_at, status")
+    .select("id, conversation_id, sender_user_id, content, created_at, status, client_id")
     .eq("conversation_id", resolvedConversationId)
     .order("created_at", { ascending: true });
 
@@ -50,6 +50,7 @@ export async function listMessages(conversationId?: string): Promise<ChatMessage
 
   return data.map((message) => ({
     id: message.id,
+    clientId: message.client_id ?? undefined,
     conversationId: message.conversation_id,
     senderUserId: message.sender_user_id,
     content: message.content,

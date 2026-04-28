@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/features/auth/server";
 import { getConversationForCurrentUser } from "@/features/conversation/server";
-import { createTextMessageForCurrentUser } from "@/features/message/actions";
+import { sendTextMessage } from "@/features/message/actions";
 import { listMessages } from "@/features/message/server";
 
 export async function GET() {
@@ -42,22 +42,31 @@ export async function POST(request: Request) {
     );
   }
 
+  const conversation = await getConversationForCurrentUser();
+
+  if (!conversation) {
+    return NextResponse.json(
+      { message: "No active conversation exists for the current user." },
+      { status: 409 },
+    );
+  }
+
   const payload = await request.json().catch(() => null);
   const content =
     payload && typeof payload.content === "string" ? payload.content : "";
-  const result = await createTextMessageForCurrentUser(content);
+  const clientId =
+    payload && typeof payload.clientId === "string" ? payload.clientId : undefined;
+  const result = await sendTextMessage(content, conversation.id, clientId);
 
   if (result.status === "error") {
     const status =
       result.code === "authentication_required"
         ? 401
-        : result.code === "conversation_not_found"
-          ? 409
-          : result.code === "empty_content" || result.code === "message_too_long"
-            ? 400
-            : result.code === "conversation_access_denied"
-              ? 403
-              : 500;
+        : result.code === "empty_content" || result.code === "message_too_long"
+          ? 400
+          : result.code === "conversation_access_denied"
+            ? 403
+            : 500;
 
     return NextResponse.json({ message: result.message }, { status });
   }

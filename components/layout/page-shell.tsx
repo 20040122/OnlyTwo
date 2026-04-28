@@ -12,7 +12,7 @@ export default function PageShell({
   title,
 }: PageShellProps) {
   return (
-    <main className="relative flex min-h-screen flex-1 items-start justify-center overflow-hidden px-6 py-10 selection:bg-rose-200 selection:text-rose-900">
+    <main className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-10 selection:bg-rose-200 selection:text-rose-900">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,241,242,0.95)_0%,rgba(255,247,237,0.88)_22%,rgba(255,251,235,0.86)_40%,rgba(239,246,255,0.84)_58%,rgba(250,245,255,0.88)_78%,rgba(254,242,242,0.94)_100%)] bg-[length:220%_220%] animate-hero-gradient" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-[8%] top-[-12%] h-72 w-72 rounded-full bg-rose-200/35 blur-3xl sm:h-96 sm:w-96" />
@@ -20,7 +20,7 @@ export default function PageShell({
         <div className="absolute left-[56%] top-[16%] h-52 w-52 rounded-full bg-sky-200/25 blur-3xl sm:h-80 sm:w-80" />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 min-h-0">
         <header className="space-y-3">
           <Link
             className="inline-flex items-center gap-3 rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-zinc-700 shadow-[0_12px_30px_rgba(255,255,255,0.3)] backdrop-blur-xl transition hover:bg-white/85"

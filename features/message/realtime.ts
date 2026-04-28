@@ -4,6 +4,7 @@ import type { ChatMessage } from "@/features/message/types";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 type MessageRow = {
+  client_id: string | null;
   content: string;
   conversation_id: string;
   created_at: string;
@@ -20,6 +21,7 @@ type SubscribeToMessagesParams = {
 
 function mapRealtimeRowToMessage(message: MessageRow): ChatMessage {
   return {
+    clientId: message.client_id ?? undefined,
     content: message.content,
     conversationId: message.conversation_id,
     createdAt: message.created_at,

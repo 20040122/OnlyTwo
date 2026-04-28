@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useEffectEvent, useRef, useState } from "react";
+import { forwardRef, startTransition, useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from "react";
 
 import MessageBubble from "@/features/message/components/message-bubble";
 import { subscribeToMessages } from "@/features/message/realtime";
@@ -11,6 +11,10 @@ type MessageListProps = {
   conversationId: string;
   currentUserId: string;
   messages: ChatMessage[];
+};
+
+export type MessageListHandle = {
+  addOptimisticMessage: (message: ChatMessage) => void;
 };
 
 function sortMessages(messages: ChatMessage[]) {
@@ -27,6 +31,13 @@ function sortMessages(messages: ChatMessage[]) {
 }
 
 function mergeMessage(messages: ChatMessage[], incomingMessage: ChatMessage) {
+  if (incomingMessage.clientId) {
+    const withoutOptimistic = messages.filter((m) => m.clientId !== incomingMessage.clientId || m.id === incomingMessage.id);
+    const nextMessages = new Map(withoutOptimistic.map((message) => [message.id, message]));
+    nextMessages.set(incomingMessage.id, incomingMessage);
+    return sortMessages([...nextMessages.values()]);
+  }
+
   const nextMessages = new Map(messages.map((message) => [message.id, message]));
   nextMessages.set(incomingMessage.id, incomingMessage);
 
@@ -51,12 +62,12 @@ function isNearBottom(element: HTMLDivElement) {
   return element.scrollHeight - element.scrollTop - element.clientHeight <= 64;
 }
 
-export default function MessageList({
+const MessageList = forwardRef<MessageListHandle, MessageListProps>(function MessageList({
   accessToken,
   conversationId,
   currentUserId,
   messages,
-}: MessageListProps) {
+}, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldStickToBottomRef = useRef(true);
   const previousMessageCountRef = useRef(messages.length);
@@ -104,6 +115,15 @@ export default function MessageList({
       console.error("syncLatestMessages failed", error);
     }
   });
+
+  useImperativeHandle(ref, () => ({
+    addOptimisticMessage(message: ChatMessage) {
+      shouldStickToBottomRef.current = true;
+      startTransition(() => {
+        setMessageItems((currentMessages) => sortMessages([...currentMessages, message]));
+      });
+    },
+  }));
 
   useEffect(() => {
     setMessageItems(sortMessages(messages));
@@ -169,7 +189,7 @@ export default function MessageList({
 
   return (
     <div
-      className="flex flex-1 flex-col gap-4 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(255,248,250,0.34))] px-4 py-6 sm:px-6"
+      className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(255,248,250,0.34))] px-4 py-6 sm:px-6"
       onScroll={(event) => {
         shouldStickToBottomRef.current = isNearBottom(event.currentTarget);
       }}
@@ -190,4 +210,6 @@ export default function MessageList({
       )}
     </div>
   );
-}
+});
+
+export default MessageList;

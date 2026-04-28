@@ -7,6 +7,7 @@ export type ChatMessage = {
   senderUserId: string;
   content: string;
   createdAt: string;
-  status: PersistedMessageStatus;
+  status: PersistedMessageStatus | LocalMessageStatus;
+  clientId?: string;
   localStatus?: LocalMessageStatus;
 };

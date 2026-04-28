@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 
 import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
@@ -10,7 +11,7 @@ export type CurrentUser = {
   email?: string | null;
 };
 
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<CurrentUser | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
 
@@ -29,4 +30,4 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     id: data.user.id,
     email: data.user.email,
   };
-}
+});

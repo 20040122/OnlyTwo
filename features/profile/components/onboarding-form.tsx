@@ -63,20 +63,6 @@ export default function OnboardingForm() {
     setAvatarValidationError("");
   }
 
-  function clearAvatarSelection() {
-    if (avatarPreviewUrl) {
-      URL.revokeObjectURL(avatarPreviewUrl);
-    }
-
-    if (avatarInputRef.current) {
-      avatarInputRef.current.value = "";
-    }
-
-    setAvatarPreviewUrl("");
-    setAvatarFileName("");
-    setAvatarValidationError("");
-  }
-
   return (
     <form action={formAction} className="space-y-5">
       <div className="space-y-2">
@@ -86,20 +72,15 @@ export default function OnboardingForm() {
         <Input
           id="nickname"
           name="nickname"
-          placeholder="给彼此起个专属昵称"
+          placeholder="昵称"
           required
         />
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <label className="text-sm font-medium text-zinc-700" htmlFor="avatarFile">
-            头像上传（可选）
-          </label>
-          <span className="text-xs text-zinc-500">
-            支持图片文件，最大 15MB
-          </span>
-        </div>
+        <label className="text-sm font-medium text-zinc-700" htmlFor="avatarFile">
+          头像上传（可选）
+        </label>
 
         <input
           accept="image/*"
@@ -131,29 +112,12 @@ export default function OnboardingForm() {
             </div>
           )}
 
-          <div className="min-w-0 flex-1 space-y-1">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-zinc-800">
               {avatarFileName || "点击选择头像图片"}
             </p>
-            <p className="text-xs leading-5 text-zinc-500">
-              选择后会在保存资料时上传到 Supabase Storage，并把公开地址写入资料表。
-            </p>
           </div>
         </label>
-
-        {avatarFileName ? (
-          <div className="flex items-center justify-between gap-3 rounded-2xl bg-zinc-50 px-4 py-3 text-xs text-zinc-500">
-            <span className="truncate">已选择：{avatarFileName}</span>
-            <button
-              className="shrink-0 font-medium text-zinc-700 transition hover:text-zinc-950"
-              disabled={pending}
-              onClick={clearAvatarSelection}
-              type="button"
-            >
-              清除
-            </button>
-          </div>
-        ) : null}
 
         {avatarValidationError ? (
           <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
@@ -172,7 +136,7 @@ export default function OnboardingForm() {
       ) : null}
 
       <Button
-        className="w-full"
+        className="w-full rounded-2xl border border-rose-200/80 bg-rose-200 text-[15px] font-semibold text-rose-950 shadow-[0_0_0_rgba(251,113,133,0.0),0_0_24px_rgba(251,113,133,0.45)] transition-[background-color,box-shadow,transform] duration-300 animate-pulse-rose hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-[0_0_0_rgba(251,113,133,0.0),0_0_38px_rgba(244,114,182,0.65)] disabled:opacity-50 disabled:pointer-events-none"
         disabled={pending || Boolean(avatarValidationError)}
         type="submit"
       >

@@ -1,17 +1,20 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  acceptInvite,
   createInvite,
-  type AcceptInviteActionState,
   type CreateInviteActionState,
 } from "@/features/relationship/actions";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+
+type AcceptState = {
+  message: string;
+  status: "idle" | "loading" | "error" | "success";
+};
 
 type InvitePanelProps = {
   currentUserId: string;
@@ -26,7 +29,6 @@ export default function InvitePanel({
 }: InvitePanelProps) {
   const router = useRouter();
   const isAcceptMode = Boolean(prefilledInviteCode);
-  const acceptFormRef = useRef<HTMLFormElement>(null);
   const hasAutoSubmittedRef = useRef(false);
   const [inviteState, createInviteAction, createInvitePending] = useActionState(
     createInvite,
@@ -36,18 +38,40 @@ export default function InvitePanel({
       status: "idle",
     } satisfies CreateInviteActionState,
   );
-  const [acceptState, acceptInviteAction, acceptInvitePending] = useActionState(
-    acceptInvite,
-    {
-      message: "",
-      status: "idle",
-    } satisfies AcceptInviteActionState,
-  );
+  const [acceptState, setAcceptState] = useState<AcceptState>({ message: "", status: "idle" });
   const [candidateCode, setCandidateCode] = useState(prefilledInviteCode ?? "");
   const currentInviteCode =
     inviteState.code || initialInviteCode || "暂未生成";
   const acceptMessage =
     acceptState.message === "邀请码不能为空。" ? "" : acceptState.message;
+
+  const handleAccept = useCallback(async (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    const code = candidateCode.trim().toUpperCase();
+    if (!code || acceptState.status === "loading") return;
+
+    setAcceptState({ message: "正在校验邀请码并完成绑定...", status: "loading" });
+
+    try {
+      const response = await fetch("/api/relationship/accept", {
+        body: JSON.stringify({ code }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
+
+      const data = await response.json() as { message?: string };
+
+      if (!response.ok) {
+        setAcceptState({ message: data.message ?? "绑定失败，请稍后重试。", status: "error" });
+        return;
+      }
+
+      router.replace("/chat");
+    } catch {
+      setAcceptState({ message: "绑定失败，请稍后重试。", status: "error" });
+    }
+  }, [candidateCode, acceptState.status, router]);
 
   useEffect(() => {
     if (!isAcceptMode || hasAutoSubmittedRef.current) {
@@ -61,8 +85,8 @@ export default function InvitePanel({
     }
 
     hasAutoSubmittedRef.current = true;
-    acceptFormRef.current?.requestSubmit();
-  }, [candidateCode, isAcceptMode]);
+    handleAccept();
+  }, [candidateCode, isAcceptMode, handleAccept]);
 
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
@@ -76,7 +100,7 @@ export default function InvitePanel({
           schema: "public",
           table: "profiles",
         },
-        (payload) => {
+        (payload: { new: { status: string } }) => {
           if (payload.new.status === "inactive") {
             router.replace("/chat");
           }
@@ -88,6 +112,16 @@ export default function InvitePanel({
       void supabase.removeChannel(channel);
     };
   }, [currentUserId, router]);
+
+  useEffect(() => {
+    if (isAcceptMode) return;
+
+    const id = setInterval(() => {
+      router.refresh();
+    }, 3000);
+
+    return () => clearInterval(id);
+  }, [isAcceptMode, router]);
 
   return (
     <section className="grid gap-5 lg:grid-cols-2">
@@ -118,9 +152,8 @@ export default function InvitePanel({
         <p className="text-sm font-medium text-zinc-600">输入邀请码</p>
 
         <form
-          action={acceptInviteAction}
           className="grid h-full grid-rows-[minmax(0,1fr)_auto] gap-4"
-          ref={acceptFormRef}
+          onSubmit={handleAccept}
         >
           <Input
             className="h-13 rounded-[1.15rem] border-white/80 bg-white/72 px-4 text-[15px] text-zinc-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_14px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl placeholder:text-zinc-400 focus:border-rose-200 focus:bg-white focus:shadow-[inset_0_1px_0_rgba(255,255,255,0.98),0_0_0_4px_rgba(251,113,133,0.08),0_18px_40px_rgba(15,23,42,0.05)]"
@@ -137,9 +170,9 @@ export default function InvitePanel({
             {isAcceptMode ? (
               <p aria-live="polite" className="min-h-6 text-sm text-zinc-500">
                 {acceptMessage
-                  || (acceptInvitePending
-                    ? "正在校验邀请码并完成绑定..."
-                    : "已自动开始校验并绑定。")}
+                    || (acceptState.status === "loading"
+                      ? "正在校验邀请码并完成绑定..."
+                      : "已自动开始校验并绑定。")}
               </p>
             ) : acceptMessage ? (
               <p aria-live="polite" className="min-h-6 text-sm text-zinc-500">
@@ -152,10 +185,10 @@ export default function InvitePanel({
             {!isAcceptMode ? (
               <Button
                 className="bg-amber-50 text-amber-950 hover:bg-yellow-50"
-                disabled={acceptInvitePending}
+                disabled={acceptState.status === "loading"}
                 type="submit"
               >
-                {acceptInvitePending ? "绑定中..." : "验证并绑定"}
+                {acceptState.status === "loading" ? "绑定中..." : "验证并绑定"}
               </Button>
             ) : null}
           </div>

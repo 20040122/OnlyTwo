@@ -12,7 +12,7 @@ export default function SignupPage() {
         <div className="absolute left-[58%] top-[18%] h-48 w-48 rounded-full bg-sky-200/30 blur-3xl sm:h-72 sm:w-72" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl">
+      <section className="relative z-10 w-full max-w-md">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-amber-200/30 blur-3xl" />
@@ -50,7 +50,7 @@ export default function SignupPage() {
             <div className="flex flex-col gap-4 border-t border-white/70 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
               <p>已有账号的话，可以直接返回登录。</p>
               <Link
-                className="inline-flex items-center justify-center rounded-full border border-white/80 bg-white/75 px-5 py-2.5 font-medium text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                className="flex h-12 w-full items-center justify-center rounded-full border border-sky-200/90 bg-sky-100 px-6 text-sky-950 shadow-[0_0_0_rgba(125,211,252,0.0),0_0_24px_rgba(125,211,252,0.42)] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-cyan-200 hover:shadow-[0_0_0_rgba(125,211,252,0.0),0_0_38px_rgba(34,211,238,0.55)] md:w-[158px]"
                 href="/login"
               >
                 前往登录

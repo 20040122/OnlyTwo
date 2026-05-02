@@ -9,7 +9,6 @@ import {
   REFRESH_TOKEN_COOKIE,
   getSessionCookieOptions,
 } from "@/features/auth/session";
-import { upsertProfileForUser } from "@/features/profile/actions";
 import {
   createServerSupabaseClient,
   createServiceRoleSupabaseClient,
@@ -141,45 +140,6 @@ async function getExistingUserByEmail(email: string) {
   }
 }
 
-async function getPostLoginRedirectPath(accessToken: string) {
-  const supabase = createServerSupabaseClient(accessToken);
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, status")
-    .limit(1)
-    .maybeSingle();
-
-  if (error || !data) {
-    return "/onboarding";
-  }
-
-  if (data.status === "inactive") {
-    return "/chat";
-  }
-
-  return "/invite";
-}
-
-async function bootstrapProfileAfterLogin(
-  accessToken: string,
-  userId: string,
-  nickname: string,
-) {
-  const normalizedNickname = nickname.trim();
-
-  if (!normalizedNickname) {
-    return;
-  }
-
-  const result = await upsertProfileForUser(accessToken, userId, {
-    nickname: normalizedNickname,
-  });
-
-  if (!result.ok) {
-    console.error("Failed to bootstrap profile after login.", result.message);
-  }
-}
-
 export async function signup(
   prevState: AuthActionState = EMPTY_STATE,
   formData: FormData,
@@ -223,7 +183,6 @@ export async function signup(
     };
   }
 
-  // Supabase may return a placeholder user with no identities when the email already exists.
   if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
     return { status: "error", message: "该邮箱已注册，请直接登录。" };
   }
@@ -266,17 +225,24 @@ export async function login(
     return { status: "error", message: "请先完成邮箱验证后再登录。" };
   }
 
-  await setSessionCookies(data.session.access_token, data.session.refresh_token);
-  await bootstrapProfileAfterLogin(
-    data.session.access_token,
-    data.user.id,
-    typeof data.user.user_metadata?.nickname === "string"
-      ? data.user.user_metadata.nickname
-      : "",
-  );
+  const [profile] = await Promise.all([
+    supabase.from("profiles").select("status").limit(1).maybeSingle(),
+    setSessionCookies(data.session.access_token, data.session.refresh_token),
+  ]);
+
   revalidatePath("/", "layout");
 
-  redirect(nextPath || await getPostLoginRedirectPath(data.session.access_token));
+  if (nextPath) {
+    redirect(nextPath);
+  }
+
+  const status = profile.data?.status;
+
+  if (!profile.data) {
+    redirect("/onboarding");
+  }
+
+  redirect(status === "inactive" ? "/chat" : "/invite");
 }
 
 export async function signOut() {

@@ -63,14 +63,14 @@ export default function LoginForm({ nextPath }: LoginFormProps) {
       ) : null}
 
       <Button
-        className="group h-13 w-full rounded-full border border-emerald-200/90 bg-emerald-100 text-[15px] font-semibold text-emerald-950 shadow-sm transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-emerald-200 hover:shadow-md"
+        className="group h-13 w-full rounded-full border border-sky-200/90 bg-sky-100 text-[15px] font-semibold text-sky-950 shadow-[0_0_0_rgba(125,211,252,0.0),0_0_24px_rgba(125,211,252,0.35)] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-cyan-200 hover:shadow-[0_0_0_rgba(125,211,252,0.0),0_0_38px_rgba(34,211,238,0.55)]"
         disabled={pending}
         type="submit"
       >
         <span className="flex items-center justify-center">
           {Array.from(submitLabel).map((character, index) => (
             <span
-              className="inline-block whitespace-pre transition-[color,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:text-emerald-700 motion-reduce:transform-none motion-reduce:transition-none"
+              className="inline-block whitespace-pre transition-[color,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:text-sky-700 motion-reduce:transform-none motion-reduce:transition-none"
               key={`${character}-${index}`}
               style={{ transitionDelay: `${index * 55}ms` }}
             >

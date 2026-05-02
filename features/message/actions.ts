@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/features/auth/server";
 import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
 import type { ChatMessage } from "@/features/message/types";
-import { requireConversationMembership } from "@/features/message/server";
 import {
   createServerSupabaseClient,
   createServiceRoleSupabaseClient,
@@ -59,16 +58,6 @@ export async function sendTextMessage(
     return {
       code: "message_too_long",
       message: `消息不能超过 ${MAX_MESSAGE_LENGTH} 个字符。`,
-      status: "error",
-    };
-  }
-
-  try {
-    await requireConversationMembership(conversationId);
-  } catch {
-    return {
-      code: "conversation_access_denied",
-      message: "你没有当前会话的发送权限。",
       status: "error",
     };
   }

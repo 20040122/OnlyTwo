@@ -15,28 +15,34 @@ export default function Home() {
       <main className="relative z-10 w-full max-w-4xl rounded-[2.5rem] border border-white/60 bg-white/60 p-10 shadow-2xl shadow-rose-900/5 backdrop-blur-2xl sm:p-14">
         <div className="flex flex-col items-center gap-10 text-center">
           <div className="relative flex items-center justify-center gap-6 px-6 py-2">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-rose-400 to-orange-400 text-white shadow-xl shadow-rose-500/30">
-              <svg
-                aria-hidden="true"
-                className="h-10 w-10 text-white/90"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 21.35 10.55 20C5.4 15.24 2 12.09 2 8.25 2 5.1 4.42 2.75 7.5 2.75c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.35 5.5 5.5 0 3.84-3.4 6.99-8.55 11.76L12 21.35Z" />
-              </svg>
+            <div className="relative">
+              <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-rose-400/25 to-orange-400/20 blur-2xl" />
+              <div className="relative flex h-20 w-20 animate-float-heart items-center justify-center rounded-3xl bg-gradient-to-br from-rose-400 to-orange-400 text-white shadow-xl shadow-rose-500/30">
+                <svg
+                  aria-hidden="true"
+                  className="h-10 w-10 text-white/90"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 21.35 10.55 20C5.4 15.24 2 12.09 2 8.25 2 5.1 4.42 2.75 7.5 2.75c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.35 5.5 5.5 0 3.84-3.4 6.99-8.55 11.76L12 21.35Z" />
+                </svg>
+              </div>
             </div>
 
-            <div className="absolute left-1/2 top-1/2 h-px w-16 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-rose-300 via-orange-300 to-sky-200" />
+            <div className="absolute left-1/2 top-1/2 h-px w-16 -translate-x-1/2 -translate-y-1/2 animate-gradient-flow bg-gradient-to-r from-rose-300 via-orange-300 to-sky-200" />
 
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-sky-300 to-cyan-200 text-white shadow-xl shadow-sky-400/30">
-              <svg
-                aria-hidden="true"
-                className="h-10 w-10 text-white/90"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 21.35 10.55 20C5.4 15.24 2 12.09 2 8.25 2 5.1 4.42 2.75 7.5 2.75c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.35 5.5 5.5 0 3.84-3.4 6.99-8.55 11.76L12 21.35Z" />
-              </svg>
+            <div className="relative">
+              <div className="absolute -inset-8 rounded-full bg-gradient-to-br from-sky-400/25 to-cyan-300/20 blur-2xl" />
+              <div className="relative flex h-20 w-20 animate-float-heart-delayed items-center justify-center rounded-3xl bg-gradient-to-br from-sky-300 to-cyan-200 text-white shadow-xl shadow-sky-400/30">
+                <svg
+                  aria-hidden="true"
+                  className="h-10 w-10 text-white/90"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 21.35 10.55 20C5.4 15.24 2 12.09 2 8.25 2 5.1 4.42 2.75 7.5 2.75c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.35 5.5 5.5 0 3.84-3.4 6.99-8.55 11.76L12 21.35Z" />
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -60,7 +66,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mx-auto max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              进入应用后，你们只会拥有一段专属关系、一个固定会话，以及一条足够简单直接的沟通路径。
+              专属关系、固定会话、隐私保护，打造只属于你们两个人的安全聊天环境，让沟通更纯粹、更安心。
             </p>
           </div>
 

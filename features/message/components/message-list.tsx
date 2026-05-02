@@ -121,9 +121,7 @@ const MessageList = forwardRef<MessageListHandle, MessageListProps>(function Mes
   useImperativeHandle(ref, () => ({
     addOptimisticMessage(message: ChatMessage) {
       shouldStickToBottomRef.current = true;
-      startTransition(() => {
-        setMessageItems((currentMessages) => sortMessages([...currentMessages, message]));
-      });
+      setMessageItems((currentMessages) => sortMessages([...currentMessages, message]));
     },
   }));
 

@@ -12,7 +12,7 @@ export default function OnboardingPage() {
         <div className="absolute left-[56%] top-[16%] h-52 w-52 rounded-full bg-sky-200/25 blur-3xl sm:h-80 sm:w-80" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl">
+      <section className="relative z-10 w-full max-w-md">
         <div className="relative overflow-hidden rounded-[2.15rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-amber-200/28 blur-3xl" />

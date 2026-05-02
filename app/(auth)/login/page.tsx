@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="absolute left-[58%] top-[18%] h-48 w-48 rounded-full bg-sky-200/30 blur-3xl sm:h-72 sm:w-72" />
       </div>
 
-      <section className="relative z-10 w-full max-w-xl">
+      <section className="relative z-10 w-full max-w-md">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/66 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-9">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/95 to-transparent" />
           <div className="pointer-events-none absolute -top-14 right-6 h-32 w-32 rounded-full bg-sky-200/30 blur-3xl" />
@@ -69,7 +69,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <div className="flex flex-col gap-4 border-t border-white/70 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
               <p>还没有账号的话，可以先创建一个。</p>
               <Link
-                className="inline-flex items-center justify-center rounded-full border border-white/80 bg-white/75 px-5 py-2.5 font-medium text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                className="flex h-12 w-full items-center justify-center rounded-full border border-rose-200/80 bg-rose-200 px-6 text-rose-950 shadow-[0_0_0_rgba(251,113,133,0.0),0_0_24px_rgba(251,113,133,0.45)] transition-[background-color,box-shadow,transform] duration-300 animate-pulse-rose hover:-translate-y-0.5 hover:bg-rose-300 hover:shadow-[0_0_0_rgba(251,113,133,0.0),0_0_38px_rgba(244,114,182,0.65)] md:w-[158px]"
                 href="/signup"
               >
                 前往注册

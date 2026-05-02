@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 
 import { sendTextMessage } from "@/features/message/actions";
 import type { ChatMessage } from "@/features/message/types";
 
 const MAX_MESSAGE_LENGTH = 2000;
+const MAX_TEXTAREA_HEIGHT = 128;
 
 type MessageInputProps = {
   conversationId: string;
@@ -14,19 +15,27 @@ type MessageInputProps = {
 };
 
 export default function MessageInput({ conversationId, currentUserId, onOptimisticSend }: MessageInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  const autoResize = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`;
+  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const content = inputRef.current?.value?.trim() ?? "";
+    const content = textareaRef.current?.value?.trim() ?? "";
     if (!content || isPending) {
       return;
     }
 
-    inputRef.current!.value = "";
+    textareaRef.current!.value = "";
+    autoResize();
     setError(null);
 
     const clientId = crypto.randomUUID();
@@ -52,23 +61,34 @@ export default function MessageInput({ conversationId, currentUserId, onOptimist
     });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      textareaRef.current?.form?.requestSubmit();
+    }
+  };
+
   return (
     <form className="space-y-1.5" onSubmit={handleSubmit}>
       <div
-        className={`flex items-center gap-2 rounded-[1.6rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(255,252,254,0.72))] p-2 shadow-[0_2px_12px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-sm transition-opacity ${isPending ? "opacity-75" : ""}`}
+        className={`mx-auto flex w-full max-w-2xl items-end gap-2 rounded-[1.6rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(255,252,254,0.72))] p-2 shadow-[0_2px_12px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-sm transition-opacity ${
+          isPending ? "opacity-75" : ""
+        }`}
       >
-        <input
-          className="flex-1 border-none bg-transparent px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none placeholder:text-zinc-400"
+        <textarea
+          className="flex-1 resize-none border-none bg-transparent px-3 py-2.5 text-sm leading-6 text-zinc-900 outline-none placeholder:text-zinc-400"
           disabled={isPending}
           maxLength={MAX_MESSAGE_LENGTH}
           name="content"
+          onChange={autoResize}
+          onKeyDown={handleKeyDown}
           placeholder="输入想说的话..."
-          ref={inputRef}
+          ref={textareaRef}
           required
-          type="text"
+          rows={1}
         />
         <button
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-[0_2px_8px_rgba(225,29,72,0.18)] transition-all duration-200 ${
+          className={`flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-full shadow-[0_2px_8px_rgba(225,29,72,0.18)] transition-all duration-200 ${
             isPending
               ? "bg-rose-200/70 text-rose-400"
               : "bg-[linear-gradient(135deg,rgba(251,113,133,0.92),rgba(251,146,60,0.88))] text-white hover:shadow-[0_4px_16px_rgba(225,29,72,0.25)] hover:scale-[1.04] active:scale-[0.97]"

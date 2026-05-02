@@ -11,6 +11,7 @@ type MessageListProps = {
   conversationId: string;
   currentUserId: string;
   messages: ChatMessage[];
+  senderProfiles: Record<string, { nickname: string; avatarUrl: string | null }>;
 };
 
 export type MessageListHandle = {
@@ -51,7 +52,7 @@ async function fetchLatestMessages() {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch messages: ${response.status}`);
+    return [];
   }
 
   const payload = (await response.json()) as { messages?: ChatMessage[] };
@@ -67,6 +68,7 @@ const MessageList = forwardRef<MessageListHandle, MessageListProps>(function Mes
   conversationId,
   currentUserId,
   messages,
+  senderProfiles,
 }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldStickToBottomRef = useRef(true);
@@ -201,6 +203,7 @@ const MessageList = forwardRef<MessageListHandle, MessageListProps>(function Mes
             isOwn={message.senderUserId === currentUserId}
             key={message.id}
             message={message}
+            senderInfo={senderProfiles[message.senderUserId]}
           />
         ))
       ) : (

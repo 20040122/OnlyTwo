@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/features/auth/server";
 import { ACCESS_TOKEN_COOKIE } from "@/features/auth/session";
 import { getConversationPageData } from "@/features/conversation/queries";
 import ChatView from "@/features/message/components/chat-view";
-import { getCurrentProfile } from "@/features/profile/server";
+import { getCurrentProfile, getProfileById } from "@/features/profile/server";
 import { getActiveRelationship } from "@/features/relationship/server";
 
 export default async function ChatPage() {
@@ -29,6 +29,24 @@ export default async function ChatPage() {
 
   if (!activeRelationship) {
     redirect("/invite");
+  }
+
+  const partnerId =
+    currentUser.id === activeRelationship.userAId
+      ? activeRelationship.userBId
+      : activeRelationship.userAId;
+
+  const partnerProfile = await getProfileById(partnerId);
+
+  const senderProfiles: Record<string, { nickname: string; avatarUrl: string | null }> = {
+    [currentUser.id]: { nickname: profile.nickname, avatarUrl: profile.avatarUrl ?? null },
+  };
+
+  if (partnerProfile) {
+    senderProfiles[partnerId] = {
+      nickname: partnerProfile.nickname,
+      avatarUrl: partnerProfile.avatarUrl ?? null,
+    };
   }
 
   const { conversation, messages } = await getConversationPageData();
@@ -61,16 +79,12 @@ export default async function ChatPage() {
       <div className="pointer-events-none absolute -top-14 left-8 h-32 w-32 rounded-full bg-rose-200/25 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-28 rounded-full bg-sky-200/20 blur-3xl" />
 
-      <div className="relative border-b border-white/70 px-6 py-5">
-        <h2 className="text-xl font-semibold tracking-tight text-zinc-950">
-          对话框
-        </h2>
-      </div>
       <ChatView
         accessToken={accessToken}
         conversationId={conversation.id}
         currentUserId={currentUser.id}
         messages={messages}
+        senderProfiles={senderProfiles}
       />
     </div>
   );
